@@ -1,0 +1,33 @@
+{
+    "name": "tyler36/response-macro",
+    "keywords": ["laravel", "service-provider", "response"],
+    "description": "Standardizing JSON responses",
+    "type": "laravel-plugin",
+    "require": {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.3",
+        "friendsofphp/php-cs-fixer": "^2.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tyler36\\ResponseMacro\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tyler36\\ResponseMacro\\ResponseMacroServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "lint": [
+            "@phpfix",
+            "@phpcs"
+        ],
+        "phpcs": "phpcs -p --standard=phpcs.xml",
+        "phpfix": "php-cs-fixer fix --show-progress=dots --allow-risky=yes"
+    }
+}
