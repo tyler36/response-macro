@@ -65,6 +65,54 @@ class ResponseMacroTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_a_success_response_with_custom_header()
+    {
+        $message     = 'My message';
+        $contentType = 'application/json; charset=utf-16';
+
+        // ASSERT:      Response with custom header
+        $this->response = response()->success($message, 200, ['Content-type' => $contentType]);
+        $response       = $this->get($this->route)
+            ->assertHeader('Content-type', $contentType);
+
+        // ASSERT:      Response with configured header
+        config()->set('response-macros.default_headers', ['Content-type' => $contentType]);
+        $this->response = response()->success($message, 200);
+        $response       = $this->get($this->route)
+            ->assertHeader('Content-type', $contentType);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_a_success_response_with_custom_options()
+    {
+        $message = '日本語';
+        $options = JSON_UNESCAPED_UNICODE;
+
+        // ASSERT:      Response with custom header
+        $this->response = response()->success($message, 400, null);
+        $response       = $this->get($this->route)
+            ->assertJsonFragment([
+                'errors'  => false,
+                'message' => $message,
+            ]);
+        $this->assertContains($message, $response->getContent());
+
+        // ASSERT:      Response with configured header
+        config()->set('response-macros.default_options', JSON_UNESCAPED_UNICODE);
+        $this->response    = response()->success($message);
+        $response          = $this->get($this->route)
+            ->assertJsonFragment([
+                'errors'  => false,
+                'message' => $message,
+            ]);
+        $this->assertContains($message, $response->getContent());
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_a_success_response_with_a_data_array()
     {
         $data    = ['apples' => 1];
@@ -139,6 +187,54 @@ class ResponseMacroTest extends TestCase
                 'errors'  => true,
                 'message' => $message,
             ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_an_error_response_with_custom_header()
+    {
+        $message     = 'My message';
+        $contentType = 'application/json; charset=utf-16';
+
+        // ASSERT:      Response with custom header
+        $this->response = response()->error($message, 400, ['Content-type' => $contentType]);
+        $response       = $this->get($this->route)
+            ->assertHeader('Content-type', $contentType);
+
+        // ASSERT:      Response with configured header
+        config()->set('response-macros.default_headers', ['Content-type' => $contentType]);
+        $this->response = response()->error($message);
+        $response       = $this->get($this->route)
+            ->assertHeader('Content-type', $contentType);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_an_error_response_with_custom_options()
+    {
+        $message = '日本語';
+        $options = JSON_UNESCAPED_UNICODE;
+
+        // ASSERT:      Response with custom header
+        $this->response = response()->error($message, 400, null);
+        $response       = $this->get($this->route)
+            ->assertJsonFragment([
+                'errors'  => true,
+                'message' => $message,
+            ]);
+        $this->assertContains($message, $response->getContent());
+
+        // ASSERT:      Response with configured header
+        config()->set('response-macros.default_options', JSON_UNESCAPED_UNICODE);
+        $this->response    = response()->error($message);
+        $response          = $this->get($this->route)
+            ->assertJsonFragment([
+                'errors'  => true,
+                'message' => $message,
+            ]);
+        $this->assertContains($message, $response->getContent());
     }
 
     /**

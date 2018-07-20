@@ -26,6 +26,9 @@ class ResponseMacroServiceProvider extends ServiceProvider
         collect($this->macros)->each(function ($item) {
             $this->{$item}();
         });
+
+        // PUBLISH:     Configuration
+        $this->publishes([__DIR__.'/vendor/config/response-macros.php' => config_path('response-macros.php')]);
     }
 
     /**
@@ -53,10 +56,12 @@ class ResponseMacroServiceProvider extends ServiceProvider
      */
     protected function success()
     {
-        Response::macro('success', function ($data, $status = 200) {
+        Response::macro('success', function ($data, $status = 200, $header = null) {
             return Response::json(
                 ResponseMacroServiceProvider::prepareData($data),
-                $status
+                $status,
+                $header ?? config('response-macros.default_headers', []),
+                $options ?? config('response-macros.default_options', null)
             );
         });
     }
@@ -94,10 +99,12 @@ class ResponseMacroServiceProvider extends ServiceProvider
      */
     protected function error()
     {
-        Response::macro('error', function ($data, $status = 400) {
+        Response::macro('error', function ($data, $status = 400, $header = null, $options = null) {
             return Response::json(
                 ResponseMacroServiceProvider::prepareData($data, $errors = true),
-                $status
+                $status,
+                $header ?? config('response-macros.default_headers', []),
+                $options ?? config('response-macros.default_options', null)
             );
         });
     }
